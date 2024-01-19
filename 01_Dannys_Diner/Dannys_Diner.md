@@ -6,6 +6,10 @@
 Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers.
 
 The full description of the case study is found [here](https://8weeksqlchallenge.com/case-study-1/).
+
+## Entity Relationship Diagram
+![SQL_Dannys_Diner_Diagram](https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/9e957c85-6ce5-41e1-903a-92f7b358a0d4)
+
 ## Create Database
 Schema (PostgreSQL v13)
 
