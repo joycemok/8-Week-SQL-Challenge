@@ -1,5 +1,7 @@
 
 # Case Study #1: Danny's Diner
+<img src = "https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/3b4ee767-a7c9-4a99-8f0d-8f7f637bdc04" width = 550, height = 550>
+
 ## Business Goal
 Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers.
 
