@@ -2,8 +2,7 @@
 
 ## ```customer_orders``` table
 
-Let's first take a look at the original ```customer_orders``` table. We can see that the **exclusions** and **extras** columns have cells without values. Additionally, when customers choose not to have exclusions and extras, the value is 
-represented in an inconsistent manner with some having no value and some having ```null```.
+Let's first take a look at the original ```customer_orders``` table. We can see that the ```exclusions``` and ```extras``` columns have cells without values. Additionally, when customers choose not to have exclusions and extras, the value is represented in an inconsistent manner with some having no value and some having null values.
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time               |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------------ |
@@ -23,8 +22,8 @@ represented in an inconsistent manner with some having no value and some having 
 | 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11T18:34:49.000Z |
 
 **Our course of action to clean the table:**
-- Convert cells where there are no exclusions or extras into the empty string
 - Create a temporary table to store the cleaned table 
+- Convert cells where there are no exclusions or extras into the empty string
 
 ``` SQL
 DROP TABLE IF EXISTS customer_orders_temp;
@@ -46,7 +45,7 @@ FROM pizza_runner.customer_orders;
 ```
 
 
-Here is our cleaned ```customer_orders``` table:
+**Here is our cleaned ```customer_orders``` table:**
 
 | order_id | customer_id | pizza_id | exclusions | extras | order_time               |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------------ |
@@ -69,42 +68,7 @@ Here is our cleaned ```customer_orders``` table:
 
 ## ```runner_orders``` table:
 
-After inspecting the ```runner_orders``` table we see that there are a number 
-
-    DROP TABLE IF EXISTS runner_orders_temp;
-    CREATE TEMP TABLE runner_orders_temp AS
-    SELECT 
-      order_id, 
-      runner_id,  
-      CASE
-    	  WHEN pickup_time LIKE 'null' THEN NULL
-    	  ELSE pickup_time
-    	  END AS pickup_time,
-      CASE
-    	  WHEN distance LIKE 'null' THEN NULL
-    	  WHEN distance LIKE '%km' THEN TRIM('km' from distance)
-    	  ELSE distance 
-        END AS distance,
-      CASE
-    	  WHEN duration LIKE 'null' THEN NULL
-    	  WHEN duration LIKE '%mins' THEN TRIM('mins' from duration)
-    	  WHEN duration LIKE '%minute' THEN TRIM('minute' from duration)
-    	  WHEN duration LIKE '%minutes' THEN TRIM('minutes' from duration)
-    	  ELSE duration
-    	  END AS duration,
-      CASE
-    	  WHEN cancellation IS NULL or cancellation LIKE 'null' THEN ''
-    	  ELSE cancellation
-    	  END AS cancellation
-    FROM pizza_runner.runner_orders;
-
----
-
-## Cleaned ```customer_orders``` table
-
-
----
-## Original ```runner_orders``` table
+After inspecting the ```runner_orders``` table we see that there are a number of issues. ```pickup_time```, ```distance```, and ```duration``` columns are all stored as ```VARCHAR```. However in order to do calculations later on, we will need to convert these data types to ```TIMESTAMP```, ```NUMERIC```, and ```INTEGER``` respectively. Additionally, certain cells in these three columns have 'null' as a string stored and we need to get rid of these before converting to their appropriate data types. The strings in these columns also have units added like 'km' or 'mins' so we need to get rid of all units as well. Finally, the ```cancellation``` column has inconsistent representation for orders that have not been cancelled.
 
 | order_id | runner_id | pickup_time         | distance | duration   | cancellation            |
 | -------- | --------- | ------------------- | -------- | ---------- | ----------------------- |
@@ -119,8 +83,50 @@ After inspecting the ```runner_orders``` table we see that there are a number
 | 9        | 2         | null                | null     | null       | Customer Cancellation   |
 | 10       | 1         | 2020-01-11 18:50:20 | 10km     | 10minutes  | null                    |
 
----
-## Cleaned runner_orders table
+
+**To reiterate this is what we will do to clean the ```runner_orders``` table:**
+- Create a temporary table to store altered table
+- ```pickup_time```: remove null values **->** change to ```TIMESTAMP``` data type
+- ```distance```: remove null values, remove unit values ('km') **->** change to ```NUMERIC``` data type
+- ```duration```: remove null values, remove unit values ('mins', 'minute', 'minutes') **->** change to ```INTEGER``` data type
+- ```cancellation```: remove null values
+
+
+``` SQL
+DROP TABLE IF EXISTS runner_orders_temp;
+CREATE TEMP TABLE runner_orders_temp AS
+SELECT 
+  order_id, 
+  runner_id,  
+  CASE
+    WHEN pickup_time LIKE 'null' THEN NULL
+    ELSE pickup_time
+    END AS pickup_time,
+  CASE
+    WHEN distance LIKE 'null' THEN NULL
+    WHEN distance LIKE '%km' THEN TRIM('km' from distance)
+    ELSE distance 
+    END AS distance,
+  CASE
+    WHEN duration LIKE 'null' THEN NULL
+    WHEN duration LIKE '%mins' THEN TRIM('mins' from duration)
+    WHEN duration LIKE '%minute' THEN TRIM('minute' from duration)
+    WHEN duration LIKE '%minutes' THEN TRIM('minutes' from duration)
+    ELSE duration
+    END AS duration,
+  CASE
+    WHEN cancellation IS NULL or cancellation LIKE 'null' THEN ''
+    ELSE cancellation
+    END AS cancellation
+FROM pizza_runner.runner_orders;
+
+ALTER TABLE runner_orders_temp 
+ALTER COLUMN pickup_time TYPE timestamp USING pickup_time::timestamp without time zone, 
+ALTER COLUMN distance TYPE numeric USING distance::numeric,
+ALTER COLUMN duration TYPE integer USING duration::integer;
+```
+
+**Here is the cleaned ```runner_orders``` table:**
 
 | order_id | runner_id | pickup_time         | distance | duration | cancellation            |
 | -------- | --------- | ------------------- | -------- | -------- | ----------------------- |
