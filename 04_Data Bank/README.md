@@ -1,4 +1,5 @@
 # Case Study #4: Data Bank
+<img src = "https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/682bd586-499a-44fc-b215-59a6e638a82e" width = 550, height = 550)>
 
 ## Business Goal
 Data Bank runs just like any other digital bank - but it isn’t only for banking activities, they also have the world’s most secure distributed data storage platform!
