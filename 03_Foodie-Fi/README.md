@@ -7,3 +7,4 @@ Subscription based businesses are super popular and Danny realised that there wa
 Danny finds a few smart friends to launch his new startup Foodie-Fi in 2020 and started selling monthly and annual subscriptions, giving their customers unlimited on-demand access to exclusive food videos from around the world! He created Foodie-Fi with a data driven mindset and wanted to ensure all future investment decisions and new features were decided using data. 
 
 ## Entitiy Relationship Diagram
+![foodie-fi_erd](https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/40acdd62-1c22-459f-83c8-72f19341faa5)
