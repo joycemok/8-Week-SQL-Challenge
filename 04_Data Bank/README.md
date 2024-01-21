@@ -9,3 +9,4 @@ Customers are allocated cloud data storage limits which are directly linked to h
 The management team at Data Bank want to increase their total customer base - but also need some help tracking just how much data storage their customers will need.
 
 ## Entity Relationship Diagram
+![data_bank_erd](https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/c50c1ba1-4dcd-46d8-9284-1dca077d0c9c)
