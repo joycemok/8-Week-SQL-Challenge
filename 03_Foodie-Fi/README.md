@@ -8,3 +8,35 @@ Danny finds a few smart friends to launch his new startup Foodie-Fi in 2020 and 
 
 ## Entity Relationship Diagram
 ![foodie-fi_erd](https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/40acdd62-1c22-459f-83c8-72f19341faa5)
+
+## A - Customer Journey
+### Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.
+
+This is the ```subscription``` table with the 8 sample customers selected:    
+
+| customer_id | plan_id | start_date               |
+| ----------- | ------- | ------------------------ |
+| 1           | 0       | 2020-08-01T00:00:00.000Z |
+| 1           | 1       | 2020-08-08T00:00:00.000Z |
+| 2           | 0       | 2020-09-20T00:00:00.000Z |
+| 2           | 3       | 2020-09-27T00:00:00.000Z |
+| 11          | 0       | 2020-11-19T00:00:00.000Z |
+| 11          | 4       | 2020-11-26T00:00:00.000Z |
+| 13          | 0       | 2020-12-15T00:00:00.000Z |
+| 13          | 1       | 2020-12-22T00:00:00.000Z |
+| 13          | 2       | 2021-03-29T00:00:00.000Z |
+| 15          | 0       | 2020-03-17T00:00:00.000Z |
+| 15          | 2       | 2020-03-24T00:00:00.000Z |
+| 15          | 4       | 2020-04-29T00:00:00.000Z |
+| 16          | 0       | 2020-05-31T00:00:00.000Z |
+| 16          | 1       | 2020-06-07T00:00:00.000Z |
+| 16          | 3       | 2020-10-21T00:00:00.000Z |
+| 18          | 0       | 2020-07-06T00:00:00.000Z |
+| 18          | 2       | 2020-07-13T00:00:00.000Z |
+| 19          | 0       | 2020-06-22T00:00:00.000Z |
+| 19          | 2       | 2020-06-29T00:00:00.000Z |
+| 19          | 3       | 2020-08-29T00:00:00.000Z |
+
+
+
+---
