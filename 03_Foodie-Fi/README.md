@@ -123,6 +123,40 @@ Let's take a look at a few of the customers subscription journeys at Foodie-Fi:
 | 1           | 0       | trial         | 2020-08-01T00:00:00.000Z |
 | 1           | 1       | basic monthly | 2020-08-08T00:00:00.000Z |
 
+Customer 1 started on a trial plan on 08/01/2020 and downgraded to a basic monthly plan on 08/08/2020 after the end of their 7 day free trial.
+
+**Customer 15:**
+
+| customer_id | plan_id | plan_name     | start_date               |
+| ----------- | ------- | ------------- | ------------------------ |
+| 15          | 0       | trial         | 2020-03-17T00:00:00.000Z |
+| 15          | 2       | pro monthly   | 2020-03-24T00:00:00.000Z |
+| 15          | 4       | churn         | 2020-04-29T00:00:00.000Z |
+
+Customer 15 started a trial plan on 03/17/2020 and subscribed to a pro-monthly plan on 03/24/2020 after the end of their 7 day free trial. On 04/29/2020, about a month later, this customer terminated their plan and churned until the end of their subscription.
+
+**Customer 16:**
+| customer_id | plan_id | plan_name     | start_date               |
+| ----------- | ------- | ------------- | ------------------------ |
+| 16          | 0       | trial         | 2020-05-31T00:00:00.000Z |
+| 16          | 1       | basic monthly | 2020-06-07T00:00:00.000Z |
+| 16          | 3       | pro annual    | 2020-10-21T00:00:00.000Z |
+
+Customer 16 started a trial plan on 05/31/2020 and downgraded to a basic monthly plan on 06/07/2020 after the end of their 7 day free trial. On 10/21/2020, about 4 months later, the customer upgraded to a pro-annual plan.
 
 ---
+
+## B - Data Analysis Questions
+
+### 1. How many customers has Foodie-Fi ever had?
+### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value
+### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name
+### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
+### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
+### 6. What is the number and percentage of customer plans after their initial free trial?
+### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
+### 8. How many customers have upgraded to an annual plan in 2020?
+### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
+### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)
+### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
 
