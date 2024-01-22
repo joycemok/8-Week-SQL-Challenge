@@ -158,15 +158,219 @@ FROM foodie_fi.subscriptions;
 |1000               |
 
 ### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value?
+```SQL
+SELECT EXTRACT(MONTH FROM sub.start_date) AS month_num, 
+TO_CHAR(start_date, 'month') AS month_name, COUNT(customer_id) AS customer_count
+FROM foodie_fi.subscriptions AS sub
+WHERE sub.plan_id = 0 
+GROUP BY month_name, month_num
+ORDER BY customer_count DESC;
+```
 
+| month_num | month_name | customer_count |
+| --------- | ---------- | -------------- |
+| 3         | march      | 94             |
+| 7         | july       | 89             |
+| 8         | august     | 88             |
+| 5         | may        | 88             |
+| 1         | january    | 88             |
+| 9         | september  | 87             |
+| 12        | december   | 84             |
+| 4         | april      | 81             |
+| 6         | june       | 79             |
+| 10        | october    | 79             |
+| 11        | november   | 75             |
+| 2         | february   | 68             |
 
-### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name
+---
+
+### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name?
+```SQL
+SELECT sub.plan_id, plans.plan_name, COUNT(sub.plan_id) AS plans_started
+FROM foodie_fi.subscriptions AS sub
+INNER JOIN foodie_fi.plans ON sub.plan_id = plans.plan_id
+WHERE sub.start_date > '2020-12-31'
+GROUP BY sub.plan_id, plans.plan_name
+ORDER BY sub.plan_id ASC;
+```
+
+| plan_id | plan_name     | plans_started |
+| ------- | ------------- | ------------- |
+| 1       | basic monthly | 8             |
+| 2       | pro monthly   | 60            |
+| 3       | pro annual    | 63            |
+| 4       | churn         | 71            |
+
+---
+
 ### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
-### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
-### 6. What is the number and percentage of customer plans after their initial free trial?
-### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
-### 8. How many customers have upgraded to an annual plan in 2020?
-### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
-### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)
-### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
+```SQL
+    SELECT COUNT(customer_id) AS customer_churn_count, 
+    ROUND(100.0 * COUNT(customer_id) / (SELECT COUNT(DISTINCT customer_id) 
+                                            FROM foodie_fi.subscriptions), 1) AS percent_churned
+    FROM foodie_fi.subscriptions
+    WHERE plan_id = 4;
+```
 
+| customer_churn_count | percent_churned |
+| -------------------- | --------------- |
+| 307                  | 30.7            |
+
+---
+### 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
+```SQL
+WITH cte_plan_rank AS (
+  SELECT *, RANK() OVER(PARTITION BY sub.customer_id ORDER BY sub.start_date ASC) AS plan_rank
+  FROM foodie_fi.subscriptions AS sub
+)
+SELECT COUNT(
+  CASE 
+      WHEN plan_rank = 2 AND plan_id = 4 THEN 1
+    END
+) AS churn_after_trial_count, 
+ROUND ((100.0 * COUNT(
+  CASE 
+      WHEN plan_rank = 2 AND plan_id = 4 THEN 1
+    END
+) / COUNT(DISTINCT customer_id)), 0) AS percent_churn_after_trial
+FROM cte_plan_rank;
+```
+
+| churn_after_trial_count | percent_churn_after_trial |
+| ----------------------- | ------------------------- |
+| 92                      | 9                         |
+
+---
+
+### 6. What is the number and percentage of customer plans after their initial free trial?
+```SQL
+WITH plan_rank AS (
+  SELECT sub.customer_id, plans.plan_id, plans.plan_name, RANK() OVER(PARTITION BY sub.customer_id ORDER BY sub.start_date) AS plan_rank
+  FROM foodie_fi.subscriptions AS sub
+    INNER JOIN foodie_fi.plans ON sub.plan_id = plans.plan_id
+    
+)
+SELECT plan_id, plan_name, COUNT(plan_id) AS plans_converted, ROUND(100.0 * COUNT(plan_id)::numeric/(SELECT COUNT(plan_id) FROM plan_rank WHERE plan_rank = 2), 2) AS plan_conversion_percentage
+FROM plan_rank
+WHERE plan_rank = 2
+GROUP BY plan_id, plan_name;
+```
+
+| plan_id | plan_name     | plans_converted | plan_conversion_percentage |
+| ------- | ------------- | --------------- | -------------------------- |
+| 1       | basic monthly | 546             | 54.60                      |
+| 2       | pro monthly   | 325             | 32.50                      |
+| 3       | pro annual    | 37              | 3.70                       |
+| 4       | churn         | 92              | 9.20                       |
+
+---
+
+### 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
+```SQL
+WITH ranking AS (
+  SELECT sub.customer_id, sub.plan_id, sub.start_date, plans.plan_name, RANK() OVER(PARTITION BY sub.customer_id ORDER BY sub.start_date DESC) AS plan_rank 
+  FROM foodie_fi.subscriptions AS sub
+  INNER JOIN foodie_fi.plans ON sub.plan_id = plans.plan_id
+  WHERE start_date <= '2020-12-31'
+)
+SELECT plan_name, COUNT(plan_id) AS customer_count, ROUND(100.0 * COUNT(plan_id)/(SELECT COUNT(plan_id) FROM ranking WHERE plan_rank = 1), 2) AS customer_percentage
+FROM ranking
+WHERE plan_rank = 1
+GROUP BY plan_name;
+```
+
+| plan_name     | customer_count | customer_percentage |
+| ------------- | -------------- | ------------------- |
+| basic monthly | 224            | 22.40               |
+| churn         | 236            | 23.60               |
+| pro annual    | 195            | 19.50               |
+| pro monthly   | 326            | 32.60               |
+| trial         | 19             | 1.90                |
+
+---
+
+### 8. How many customers have upgraded to an annual plan in 2020?
+```SQL
+    SELECT COUNT(DISTINCT sub.customer_id) as annual_plan_count
+    FROM foodie_fi.subscriptions AS sub
+    WHERE (sub.start_date BETWEEN '2020-01-01' AND '2020-12-31') AND sub.plan_id = 3;
+```
+
+| annual_plan_count |
+| ----------------- |
+| 195               |
+
+---
+
+### 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
+```SQL
+SELECT ROUND(AVG(s2.start_date - s1.start_date)) AS average_days
+FROM foodie_fi.subscriptions AS s1
+INNER JOIN foodie_fi.subscriptions AS s2
+ON s1.customer_id = s2.customer_id
+  AND s1.plan_id + 3 = s2.plan_id
+WHERE s2.plan_id = 3;
+```
+
+| average_days |
+| ------------ |
+| 105          |
+
+---
+
+### 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)
+```SQL
+WITH duration_table AS (
+  SELECT s2.start_date - s1.start_date AS duration,
+  WIDTH_BUCKET(s2.start_date - s1.start_date, 1, 360, 12) AS bin
+  FROM foodie_fi.subscriptions s1
+  INNER JOIN foodie_fi.subscriptions s2
+  ON s1.customer_id = s2.customer_id
+   AND s1.plan_id +  3 = s2.plan_id
+  WHERE s2.plan_id = 3
+  ORDER BY duration 
+ )
+ SELECT CONCAT((bin-1)*30+1,' - ',bin*30,' days') AS intervals, 
+  ROUND(AVG(duration)) AS avg_days,
+  COUNT(bin) AS customer_count
+ FROM duration_table
+ GROUP BY bin;
+```
+
+| intervals      | avg_days | customer_count |
+| -------------- | -------- | -------------- |
+| 1 - 30 days    | 10       | 49             |
+| 31 - 60 days   | 42       | 24             |
+| 61 - 90 days   | 71       | 34             |
+| 91 - 120 days  | 101      | 35             |
+| 121 - 150 days | 133      | 42             |
+| 151 - 180 days | 162      | 36             |
+| 181 - 210 days | 191      | 26             |
+| 211 - 240 days | 224      | 4              |
+| 241 - 270 days | 257      | 5              |
+| 271 - 300 days | 285      | 1              |
+| 301 - 330 days | 327      | 1              |
+| 331 - 360 days | 346      | 1              |
+
+---
+
+### 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
+```SQL
+    WITH ranked AS (
+      SELECT sub.customer_id, plans.plan_id, plans.plan_name, 
+      LEAD(plans.plan_id) OVER (PARTITION BY sub.customer_id ORDER BY sub.start_date) AS next_plan
+      FROM foodie_fi.subscriptions AS sub
+      INNER JOIN foodie_fi.plans 
+      	ON sub.plan_id = plans.plan_id
+     WHERE sub.start_date BETWEEN '2020-01-01' AND '2020-12-31'
+    )
+    SELECT COUNT(customer_id) AS customer_downgrade_count
+    FROM ranked
+    WHERE plan_id = 2 AND next_plan = 1;
+```
+
+| customer_downgrade_count |
+| ------------------------ |
+| 0                        |
+
+---
