@@ -149,6 +149,14 @@ Customer 16 started a trial plan on 05/31/2020 and downgraded to a basic monthly
 ## B - Data Analysis Questions
 
 ### 1. How many customers has Foodie-Fi ever had?
+```SQL
+SELECT COUNT(DISTINCT customer_id) AS number_of_customers
+FROM foodie_fi.subscriptions;
+```
+|number_of_customers|
+| ----------------- |
+|1000               |
+
 ### 2. What is the monthly distribution of trial plan start_date values for our dataset - use the start of the month as the group by value
 ### 3. What plan start_date values occur after the year 2020 for our dataset? Show the breakdown by count of events for each plan_name
 ### 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
