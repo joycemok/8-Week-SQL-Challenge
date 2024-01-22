@@ -116,7 +116,13 @@ ORDER BY sub.customer_id ASC, plans.plan_id ASC;
 
 Let's take a look at a few of the customers subscription journeys at Foodie-Fi:
 
-**Customer 
+**Customer 1:**
+
+| customer_id | plan_id | plan_name     | start_date               |
+| ----------- | ------- | ------------- | ------------------------ |
+| 1           | 0       | trial         | 2020-08-01T00:00:00.000Z |
+| 1           | 1       | basic monthly | 2020-08-08T00:00:00.000Z |
+
 
 ---
 
