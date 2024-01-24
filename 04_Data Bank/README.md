@@ -10,3 +10,13 @@ The management team at Data Bank want to increase their total customer base - bu
 
 ## Entity Relationship Diagram
 ![data_bank_erd](https://github.com/joycemok/8-Week-SQL-Challenge/assets/107952129/c50c1ba1-4dcd-46d8-9284-1dca077d0c9c)
+
+# Case Study Questions
+
+## A - Customer Nodes Exploration
+### 1. How many unique nodes are there on the Data Bank system?
+
+### 2. What is the number of nodes per region?
+### 3. How many customers are allocated to each region?
+### 4. How many days on average are customers reallocated to a different node?
+### 5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region? 
