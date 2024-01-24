@@ -154,7 +154,61 @@ GROUP BY ct.txn_type;
 ---
 
 ### 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
+```SQL
+WITH transactions AS (
+SELECT
+TO_CHAR(txn_date, 'month') AS months,
+customer_id,
+SUM(CASE WHEN txn_type = 'deposit' THEN 1 ELSE 0 END) as deposits,
+SUM(CASE WHEN txn_type <> 'deposit' THEN 1 ELSE 0 END) AS withdrawals_and_purchases
+FROM data_bank.customer_transactions
+GROUP BY customer_id, TO_CHAR(txn_date, 'month')
+HAVING SUM(CASE WHEN txn_type = 'deposit' THEN 1 ELSE 0 END) > 1
+AND SUM(CASE WHEN txn_type <> 'deposit' THEN 1 ELSE 0 END) > 1
+)
+SELECT
+months,
+COUNT(customer_id) AS customers
+FROM transactions
+GROUP BY months;
+```
+
+| months   | customers |
+| -------- | --------- |
+| april    | 48        |
+| february | 145       |
+| january  | 115       |
+| march    | 154       |
+
+---
+
 ### 4. What is the closing balance for each customer at the end of the month?
-### 5. What is the percentage of customers who increase their closing balance by more than 5%?
+```SQL
+SELECT customer_id, TO_CHAR(txn_date, 'month') AS months,
+SUM(
+  CASE 
+  	WHEN txn_type = 'deposit' THEN txn_amount 
+  	WHEN txn_type = 'withdrawl' THEN -txn_amount
+  	WHEN txn_type = 'purchase' THEN - txn_amount
+  	ELSE 0
+  END
+) AS total_balance
+FROM data_bank.customer_transactions
+GROUP BY customer_id, TO_CHAR(txn_date, 'month')
+ORDER BY customer_id ASC, TO_CHAR(txn_date, 'month') ASC;
+```
 
+This is the first 3 customers on the list as the full table is too long to display. 
 
+| customer_id | months    | total_balance |
+| ----------- | --------- | ------------- |
+| 1	          | january   | 312           |
+| 1	          | march	  |-952           |
+| 2	          | january   | 549           |
+| 2	          | march     | 61            |
+| 3	          | april     | 493           |
+| 3	          | february  | -965          |
+| 3           |	january   |	144           |
+| 3	          | march     |	0             |
+
+---
